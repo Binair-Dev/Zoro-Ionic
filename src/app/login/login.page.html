@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Connexion</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div>
+    <ion-item>
+      <ion-input  [(ngModel)]="email" type="text" placeholder="Email" ngModel required></ion-input>
+    </ion-item>
+    <ion-item>
+        <ion-input [(ngModel)]="password" type="password" placeholder="Mot de passe" ngModel required></ion-input>
+    </ion-item>
+    <ion-item>
+      <div class='center-button'>
+        <ion-button name="connexion" (click)="logIn()">Connexion</ion-button>
+     </div>
+    </ion-item>
+  </div>
+</ion-content>

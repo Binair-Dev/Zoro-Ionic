@@ -1,0 +1,29 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Votre profil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div style="padding-top: 50px;">
+    <img src="{{user.Avatar}}" alt="Avatar">
+    <div class="informations">
+      <ion-input [(ngModel)]="avatar" placeholder="Lien de l'avatar" value="{{user.Avatar}}"></ion-input>
+    </div>
+    <div class="informations center">
+      <ion-button (click)="changeAvatar()">Modifier mon avatar</ion-button>
+    </div>
+    <div class="informations">
+      <span>Email:</span><ion-label> {{user.Email}}</ion-label>
+    </div>
+    <div class="informations">
+      <span>Rang:</span><ion-label> {{user.Rank}}</ion-label>
+    </div>
+    <div class="informations">
+      <ion-input [(ngModel)]="password" placeholder="Mot de passe"></ion-input>
+    </div>
+    <div class="informations center">
+      <ion-button (click)="changePass()">Modifier le mot de passe</ion-button>
+    </div>
+  </div>
+</ion-content>

@@ -8,7 +8,7 @@
   <div style="padding-top: 50px;">
     <img src="{{user.Avatar}}" alt="Avatar">
     <div class="informations">
-      <ion-input [(ngModel)]="avatar" placeholder="Lien de l'avatar" value="{{user.Avatar}}"></ion-input>
+      <ion-input [(ngModel)]="avatar" placeholder="Nouveau lien de l'avatar" value="{{user.Avatar}}"></ion-input>
     </div>
     <div class="informations center">
       <ion-button (click)="changeAvatar()">Modifier mon avatar</ion-button>
@@ -20,7 +20,7 @@
       <span>Rang:</span><ion-label> {{user.Rank}}</ion-label>
     </div>
     <div class="informations">
-      <ion-input [(ngModel)]="password" placeholder="Mot de passe"></ion-input>
+      <ion-input [(ngModel)]="password" placeholder="Nouveau mot de passe"></ion-input>
     </div>
     <div class="informations center">
       <ion-button (click)="changePass()">Modifier le mot de passe</ion-button>

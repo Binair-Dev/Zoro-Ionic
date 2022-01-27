@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { ToastController } from '@ionic/angular';
 import { User } from '../_models/user';
 import { AuthService } from '../_services/auth.service';
 import { LogoutService } from '../_services/logout.service';
@@ -18,7 +19,7 @@ export class ProfilePage implements OnInit {
 
   user: User = null;
 
-  constructor(private authService: AuthService, private router: Router, private userService: UserService, private logoutService: LogoutService) {
+  constructor(private authService: AuthService, private router: Router, private userService: UserService, private logoutService: LogoutService, private toastController: ToastController) {
     if(this.authService.isLogged$.getValue()) this.user = this.authService.getUser();
     else this.router.navigate(['/logout']);
   }
@@ -27,24 +28,46 @@ export class ProfilePage implements OnInit {
   }
 
   async changePass() {
+    const toast = await this.toastController.create({
+      message: 'Modification réussie.',
+      duration: 2000,
+      color: 'success'
+    });
+
     let newPass =  await sha256(this.password);
     this.userService.update({Password: newPass}).toPromise().then(data => {
       if(data) {
-        console.log(data);
+        toast.message = 'Modification réussie.';
+        toast.color = 'success';
+        toast.present();
         this.logoutService.logout();
       }
     }).catch(err => {
+      toast.message = 'Erreur lors de la modification.';
+      toast.color = 'danger';
+      toast.present();
       console.log(err);
     })
   }
 
   async changeAvatar() {
+    const toast = await this.toastController.create({
+      message: 'Modification réussie.',
+      duration: 2000,
+      color: 'success'
+    });
     this.userService.update({Avatar: this.avatar}).toPromise().then(data => {
       if(data) {
+        toast.message = 'Modification réussie.';
+        toast.color = 'success';
+        toast.present();
         console.log(data);
         this.logoutService.logout();
       }
     }).catch(err => {
+      toast.message = 'Erreur lors de la modification.';
+      toast.color = 'danger';
+      toast.present();
       console.log(err);
     })
   }

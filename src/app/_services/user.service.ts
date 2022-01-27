@@ -15,4 +15,8 @@ export class UserService {
   update(user: any): Observable<any> {
     return this.httpClient.put(this.AUTH_SERVER + "/api/user/" + this.authService.user.Email, user, {headers: {'Authorization':'Bearer ' + JSON.parse(localStorage.getItem("token")).accessToken}});
   }
+
+  create(user: any): Observable<any> {
+    return this.httpClient.post(this.AUTH_SERVER + "/api/user/", user, {headers: {'Authorization':'Bearer ' + JSON.parse(localStorage.getItem("token")).accessToken}});
+  }
 }

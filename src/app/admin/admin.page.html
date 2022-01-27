@@ -4,11 +4,31 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content *ngIf="!isOneSelected()">
   <div class='center-button'>
-    <ion-button name="create-user">Créer un utilisateur</ion-button>
+    <ion-button name="create-user" (click)="userCreateClick()">Créer un utilisateur</ion-button>
   </div>
   <div class='center-button'>
-    <ion-button name="delete-user">Supprimer un utilisateur</ion-button>
+    <ion-button (click)="userDeleteClick()">Supprimer un utilisateur</ion-button>
+  </div>
+  <div class='center-button'>
+    <ion-button (click)="rankCreateClick()">Créer un rang</ion-button>
+  </div>
+  <div class='center-button'>
+    <ion-button (click)="rankDeleteClick()">Supprimer un rang</ion-button>
+  </div>
+</ion-content>
+<ion-content *ngIf="this.userCreate === true">
+  <ion-item>
+    <ion-input  [(ngModel)]="email" type="text" placeholder="Email" ngModel required></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-input  [(ngModel)]="password" type="text" placeholder="Mot de passe" ngModel required></ion-input>
+  </ion-item>
+  <div class='center-button'>
+    <ion-button (click)="generateRandomPassword()">Générer mot de passe</ion-button>
+  </div>
+  <div class='center-button'>
+    <ion-button (click)="createUser()">Créer l'utilisateur</ion-button>
   </div>
 </ion-content>

@@ -31,7 +31,7 @@ export class LoginPage implements OnInit {
       color: 'success'
     });
 
-    this.authService.login({Email: this.email, Password: password}).toPromise().then(data => {
+    this.authService.login({Email: this.email, Password: password}).subscribe(data => {
       if(data){
         localStorage.setItem("token", JSON.stringify(data));
         this.authService.user = decode(data.accessToken) as User;
@@ -40,7 +40,7 @@ export class LoginPage implements OnInit {
         toast.color = 'success';
         toast.present();
       }
-    }).catch(err => {
+    }, e => {
       this.authService.isLogged$.next(false);
       this.authService.user = null;
       toast.message = 'Connexion échouée.';

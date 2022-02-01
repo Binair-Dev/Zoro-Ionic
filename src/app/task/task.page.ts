@@ -51,17 +51,17 @@ export class TaskPage implements OnInit {
     } else this.isAdmin = true;
 
     if(this.isAdmin) {
-      this.agendaService.getAll().toPromise().then(data => {
+      this.agendaService.getAll().subscribe(data => {
         if(data) this.Agendas = data;
-      }).catch(err => this.logoutService.logout());
+      }, err => this.logoutService.logout());
 
-      this.userService.getAll().toPromise().then(data => {
+      this.userService.getAll().subscribe(data => {
         if(data) this.Concerning = data;
-      }).catch(err => this.logoutService.logout());
+      }, err => this.logoutService.logout());
 
-      this.categoryService.getAll().toPromise().then(data => {
+      this.categoryService.getAll().subscribe(data => {
         if(data) this.Categories = data;
-      }).catch(err => this.logoutService.logout());
+      }, err => this.logoutService.logout());
     }
   }
 
@@ -170,13 +170,13 @@ export class TaskPage implements OnInit {
       await this.agendaService.create({
         startDate: this.startDate,
         endDate: this.endDate
-      }).toPromise().then(data => {
+      }).subscribe(data => {
         if(data) {
           if(data._id !== null) {
             aId = data._id;
           }
         }
-      }).catch(err => this.logoutService.logout())
+      }, err => this.logoutService.logout());
     }
     if(aId) {
       this.taskService.create({
@@ -186,11 +186,11 @@ export class TaskPage implements OnInit {
         AgendaId: aId,
         UserId: this.authService.getUser()._id,
         Concerning: this.getConcerned(),
-      }).toPromise().then(data => {
+      }).subscribe(data => {
         if(data) {
           toast.present();
         }
-      }).catch(err => this.logoutService.logout())
+      }, err => this.logoutService.logout());
     }
     this.reset();
   }

@@ -76,13 +76,13 @@ export class AdminPage implements OnInit {
       Avatar: "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png"
     }
 
-    this.userService.create(user).toPromise().then(data => {
+    this.userService.create(user).subscribe(data => {
       toast.message = "Création de l'utilisateur réussie.";
       toast.color = 'success';
       toast.present();
       this.reset();
       this.reloadUsers();
-    }).then().catch(err => {
+    }, e => {
       toast.message = "Création de l'utilisateur échouée.";
       toast.color = 'danger';
       toast.present();
@@ -92,20 +92,20 @@ export class AdminPage implements OnInit {
 
   reloadCategories() {
     this.categoryList = null;
-    this.categoryService.getAll().toPromise().then(data => {
+    this.categoryService.getAll().subscribe(data => {
       if(data) {
         this.categoryList = data;
       }
-    }).catch(err => this.logoutService.logout())
+    }, err => this.logoutService.logout());
   }
 
   reloadUsers() {
     this.userList = null;
-    this.userService.getAll().toPromise().then(data => {
+    this.userService.getAll().subscribe(data => {
       if(data) {
         this.userList = data;
       }
-    }).catch(err => this.logoutService.logout())
+    }, err => this.logoutService.logout());
   }
 
   reset() {
@@ -148,10 +148,10 @@ export class AdminPage implements OnInit {
         {
           text: 'Oui',
           handler: () => {
-            this.userService.delete(id).toPromise().then(data => {
+            this.userService.delete(id).subscribe(data => {
               toast.present();
               this.reloadUsers();
-            }).catch(err => this.logoutService.logout())
+            }, e => this.logoutService.logout())
           }
         },
         {
@@ -177,10 +177,10 @@ export class AdminPage implements OnInit {
         {
           text: 'Oui',
           handler: () => {
-            this.categoryService.delete(id).toPromise().then(data => {
+            this.categoryService.delete(id).subscribe(data => {
               toast.present();
               this.reloadCategories();
-            }).catch(err => this.logoutService.logout())
+            }, e => this.logoutService.logout());
           }
         },
         {
@@ -193,19 +193,19 @@ export class AdminPage implements OnInit {
   }
 
   rankUp(email: string) {
-    this.userService.update({RankId: "1"}, email).toPromise().then(data => {
+    this.userService.update({RankId: "1"}, email).subscribe(data => {
       this.reloadUsers();
-    }).catch(err => this.logoutService.logout())
+    }, err => this.logoutService.logout());
   }
 
   rankDown(email: string) {
-    this.userService.update({RankId: "0"}, email).toPromise().then(data => {
+    this.userService.update({RankId: "0"}, email).subscribe(data => {
       this.reloadUsers();
-    }).catch(err => this.logoutService.logout())
+    }, err => this.logoutService.logout());
   }
 
   async createCategory() {
-    await this.categoryService.create({Name: this.category}).toPromise().then(async (data) => {
+    await this.categoryService.create({Name: this.category}).subscribe(async (data) => {
       const toast = await this.toastController.create({
         message: 'Création réussie.',
         duration: 2000,
@@ -214,6 +214,6 @@ export class AdminPage implements OnInit {
       toast.present();
       this.reset();
       this.reloadCategories();
-    }).catch(err => this.logoutService.logout())
+    }, err => this.logoutService.logout());
   }
 }

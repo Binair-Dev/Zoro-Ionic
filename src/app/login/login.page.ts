@@ -5,6 +5,7 @@ import decode from 'jwt-decode';
 import { User } from '../_models/user';
 import { AuthService } from '../_services/auth.service';
 import { LocalStorageService } from '../_services/local-storage.service';
+import { UserService } from '../_services/user.service';
 import { sha256 } from '../_tools/password-hash';
 
 @Component({
@@ -17,7 +18,7 @@ export class LoginPage implements OnInit {
   email:string;
   password:string;
 
-  constructor(private authService: AuthService, private localStorage: LocalStorageService, private toastController: ToastController, private route: Router) {}
+  constructor(private authService: AuthService, private localStorage: LocalStorageService, private toastController: ToastController, private route: Router, private userService: UserService) {}
 
   ngOnInit() {
   }

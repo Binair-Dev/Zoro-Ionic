@@ -1,6 +1,11 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Administration</ion-title>
+    <ion-item>
+      <ion-title>Administration</ion-title>
+      <ion-button *ngIf="this.userEdit" (click)="reloadUsers()"><ion-icon name="refresh"></ion-icon></ion-button>
+      <ion-button *ngIf="this.catDelete" (click)="reloadCategories()"><ion-icon name="refresh"></ion-icon></ion-button>
+      <ion-button *ngIf="isOneSelected()" class="btn-normal" (click)="resetPage()">Retour</ion-button>
+    </ion-item>
   </ion-toolbar>
 </ion-header>
 
@@ -9,18 +14,18 @@
     <ion-button name="create-user" (click)="userCreateClick()">Créer un utilisateur</ion-button>
   </div>
   <div class='center-button'>
-    <ion-button (click)="userDeleteClick()">Supprimer un utilisateur</ion-button>
+    <ion-button (click)="userEditClick()">Modifier un utilisateur</ion-button>
   </div>
   <div class='center-button'>
-    <ion-button (click)="rankCreateClick()">Créer un rang</ion-button>
+    <ion-button (click)="this.catCreate = true">Créer une catégorie</ion-button>
   </div>
   <div class='center-button'>
-    <ion-button (click)="rankDeleteClick()">Supprimer un rang</ion-button>
+    <ion-button (click)="this.catDelete = true">Supprimer une catégorie</ion-button>
   </div>
 </ion-content>
 <ion-content *ngIf="this.userCreate === true">
   <ion-item>
-    <ion-input  [(ngModel)]="email" type="text" placeholder="Email" ngModel required></ion-input>
+    <ion-input  [(ngModel)]="email" type="text" placeholder="Email | Nom d'utilisateur" ngModel required></ion-input>
   </ion-item>
   <ion-item>
     <ion-input  [(ngModel)]="password" type="text" placeholder="Mot de passe" ngModel required></ion-input>
@@ -31,4 +36,31 @@
   <div class='center-button'>
     <ion-button (click)="createUser()">Créer l'utilisateur</ion-button>
   </div>
+</ion-content>
+<ion-content *ngIf="this.userEdit">
+  <ion-list *ngFor="let item of this.userList">
+    <ion-item *ngIf="!item.isSoftDeleted">
+      <ion-img class="avatar" src="{{item.Avatar}}"></ion-img>
+      <ion-label>{{item.Email}}</ion-label>
+      <ion-button *ngIf="item.RankId !== '1'" class="btn-success" (click)="rankUp(item.Email)"><ion-icon name="star"></ion-icon></ion-button>
+      <ion-button *ngIf="item.RankId === '1'" class="btn-danger" (click)="rankDown(item.Email)"><ion-icon name="star"></ion-icon></ion-button>
+      <ion-button class="btn-danger" (click)="deleteUser(item._id)">X</ion-button>
+    </ion-item>
+  </ion-list>
+</ion-content>
+<ion-content *ngIf="this.catCreate">
+  <ion-item>
+    <ion-input  [(ngModel)]="category" type="text" placeholder="Nom de la catégorie" ngModel required></ion-input>
+  </ion-item>
+  <div class='center-button'>
+    <ion-button (click)="createCategory()">Créer la catégorie</ion-button>
+  </div>
+</ion-content>
+<ion-content *ngIf="this.catDelete === true">
+  <ion-list *ngFor="let item of this.categoryList">
+    <ion-item>
+      <ion-label>{{item.Name}}</ion-label>
+      <ion-button class="btn-danger" (click)="deleteCategory(item._id)">X</ion-button>
+    </ion-item>
+  </ion-list>
 </ion-content>

@@ -1,0 +1,49 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-item>
+      <ion-title>Tâches</ion-title>
+      <ion-button *ngIf="isCreating" class="btn-normal" (click)="reset()">Retour</ion-button>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-button *ngIf="isAdmin && !isCreating" (click)="isCreating = true" class="center-button">
+    Créer une tâche
+  </ion-button>
+  <ion-content *ngIf="isCreating">
+    <div>
+      <ion-item>
+        <ion-input  [(ngModel)]="name" type="text" placeholder="Nom" ngModel required></ion-input>
+      </ion-item>
+      <ion-item>
+          <ion-input [(ngModel)]="description" type="text" placeholder="Description" ngModel required></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-select placeholder="Sélectionne une catégorie" [(ngModel)]="selectedCat">
+          <ion-select-option *ngFor="let cat of Categories">{{cat.Name}}</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <div class='center-button'>
+          <ion-button (click)="selectDates()">Définir les dates</ion-button>
+        </div>
+      </ion-item>
+      <ion-item>
+        <ion-label>Concerne</ion-label>
+        <ion-select multiple="true" cancelText="Annuler" okText="Valider" [(ngModel)]="selectedUsers">
+          <ion-select-option *ngFor="let user of Concerning">{{user.Email}}</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <div class='center-button'>
+          <ion-button (click)="createTask()">Créer</ion-button>
+       </div>
+      </ion-item>
+    </div>
+  </ion-content>
+  <ion-content *ngIf="!isCreating">
+
+  </ion-content>
+</ion-content>

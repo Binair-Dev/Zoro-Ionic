@@ -14,5 +14,25 @@
       </ion-list>
     </ion-content>
   </ion-menu>
+
+  <!--
+  <ion-menu side="end" type="push" contentId="main">
+    <ion-header>
+      <ion-toolbar color="danger">
+        <ion-title>Membres connectés</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <ion-list *ngFor="let item of this.connectedUsers">
+        <ion-label>
+          <span *ngIf="item.isConnected" class="logged-in">●</span>
+          <span *ngIf="!item.isConnected" class="logged-out">●</span>
+          {{item.Email}}
+        </ion-label>
+      </ion-list>
+    </ion-content>
+  </ion-menu>
+  -->
+
   <ion-router-outlet id="main"></ion-router-outlet>
 </ion-app>

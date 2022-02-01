@@ -35,7 +35,7 @@ export class ProfilePage implements OnInit {
     });
 
     let newPass =  await sha256(this.password);
-    this.userService.update({Password: newPass}).toPromise().then(data => {
+    this.userService.update({Password: newPass}, this.authService.getUser().Email).toPromise().then(data => {
       if(data) {
         toast.message = 'Modification réussie.';
         toast.color = 'success';
@@ -56,7 +56,7 @@ export class ProfilePage implements OnInit {
       duration: 2000,
       color: 'success'
     });
-    this.userService.update({Avatar: this.avatar}).toPromise().then(data => {
+    this.userService.update({Avatar: this.avatar}, this.authService.getUser().Email).toPromise().then(data => {
       if(data) {
         toast.message = 'Modification réussie.';
         toast.color = 'success';

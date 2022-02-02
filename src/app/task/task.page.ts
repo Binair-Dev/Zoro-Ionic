@@ -17,6 +17,8 @@ export class TaskPage implements OnInit {
 
   isAdmin: boolean = false;
   isCreating: boolean = false;
+  isEditing: boolean = false;
+  isAddingSomeone: boolean = false;
 
   name: String;
   description: String;
@@ -32,6 +34,9 @@ export class TaskPage implements OnInit {
 
   startDate: Date = null;
   endDate: Date = null;
+
+  TaskList: any[];
+  actualTask: any;
 
   constructor(
     private authService: AuthService,
@@ -49,6 +54,10 @@ export class TaskPage implements OnInit {
     if(this.authService.getUser().RankId !== "0") {
       this.isAdmin = false;
     } else this.isAdmin = true;
+
+    this.taskService.getAll().subscribe(data => {
+      if(data) this.TaskList = data;
+    }, err => this.logoutService.logout());
 
     if(this.isAdmin) {
       this.agendaService.getAll().subscribe(data => {
@@ -88,12 +97,13 @@ export class TaskPage implements OnInit {
         {
           name: 'fromDt',
           type: 'date',
-          value: firstDate,
+          value: (this.startDate !== null ? this.format_date(this.startDate) : firstDate),
           max: maxDate
         },
         {
           name: 'toDt',
           type: 'date',
+          value: (this.endDate !== null ? this.format_date(this.endDate) : null),
         }
       ],
       buttons:
@@ -102,9 +112,6 @@ export class TaskPage implements OnInit {
           text: 'Annuler',
           role: 'cancel',
           cssClass: 'secondary',
-          handler: () => {
-            console.log('Confirm Cancel');
-          }
         },
         {
           text: 'Valider',
@@ -137,7 +144,8 @@ export class TaskPage implements OnInit {
         splitted.forEach(users => {
           this.Concerning.forEach(element => {
             if(element.Email === users.trim()) {
-              tempList.push(element._id);
+              if(element._id !== this.authService.getUser()._id)
+                tempList.push(element._id);
             }
           });
         });
@@ -146,7 +154,36 @@ export class TaskPage implements OnInit {
     }
   }
 
+  reloadUsers() {
+    this.Concerning = null;
+    this.userService.getAll().subscribe(data => {
+      if(data) this.Concerning = data;
+    }, err => this.logoutService.logout());
+  }
   reset() {
+    this.TaskList = null;
+    this.Agendas = null;
+    this.Concerning = null;
+    this.Categories = null;
+
+    this.taskService.getAll().subscribe(data => {
+      if(data) this.TaskList = data;
+    }, err => this.logoutService.logout());
+
+    if(this.isAdmin) {
+      this.agendaService.getAll().subscribe(data => {
+        if(data) this.Agendas = data;
+      }, err => this.logoutService.logout());
+
+      this.userService.getAll().subscribe(data => {
+        if(data) this.Concerning = data;
+      }, err => this.logoutService.logout());
+
+      this.categoryService.getAll().subscribe(data => {
+        if(data) this.Categories = data;
+      }, err => this.logoutService.logout());
+    }
+
     this.startDate = null;
     this.endDate = null;
     this.name = null;
@@ -157,6 +194,8 @@ export class TaskPage implements OnInit {
     this.selectedCat = null;
     this.selectedUsers = null;
     this.isCreating = false;
+    this.isEditing = false;
+    this.isAddingSomeone = false;
   }
 
   async createTask() {
@@ -167,31 +206,161 @@ export class TaskPage implements OnInit {
     });
     let aId;
     if(this.startDate !== null && this.endDate !== null) {
-      await this.agendaService.create({
-        startDate: this.startDate,
-        endDate: this.endDate
-      }).subscribe(data => {
-        if(data) {
-          if(data._id !== null) {
-            aId = data._id;
-          }
-        }
-      }, err => this.logoutService.logout());
-    }
-    if(aId) {
-      this.taskService.create({
-        CategoryId: this.getCategory(),
-        Name: this.name,
-        Description: this.description,
-        AgendaId: aId,
-        UserId: this.authService.getUser()._id,
-        Concerning: this.getConcerned(),
-      }).subscribe(data => {
-        if(data) {
-          toast.present();
-        }
-      }, err => this.logoutService.logout());
+
+          this.taskService.create({
+            startDate: this.startDate,
+            endDate: this.endDate,
+
+            CategoryId: this.getCategory(),
+            Name: this.name,
+            Description: this.description,
+            AgendaId: aId,
+            UserId: this.authService.getUser()._id,
+            Concerning: this.getConcerned(),
+          }).subscribe(data => {
+            this.reloadTasks();
+            if(data) {
+              toast.present();
+            }
+          }, err => this.logoutService.logout());
+
     }
     this.reset();
+  }
+
+  async deleteTask(task: any) {
+    const alert = await this.alertController.create({
+      header: 'Attention',
+      message: 'Voulez vous vraiment supprimer cette catégorie ?',
+      buttons: [
+        {
+          text: 'Oui',
+          handler: () => {
+            this.delTask(task);
+          }
+        },
+        {
+          text: 'Non',
+          role: 'cancel',
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  async delTask(task: any) {
+    const toast = await this.toastController.create({
+      message: 'Supression de la tâche réussie.',
+      duration: 2000,
+      color: 'success'
+    });
+
+    this.taskService.delete(task).subscribe(data => {
+      console.log(data);
+      toast.present();
+      this.reloadTasks()
+    }, e => {
+      console.log(e);
+
+      this.logoutService.logout();
+      toast.message = "Supression de la tâche échouée !"
+      toast.color = "danger";
+      toast.present();
+    })
+    window.location.reload();
+  }
+
+  reloadTasks() {
+    this.taskService.getAll().subscribe(data => {
+      this.TaskList = data;
+    }, err => this.logoutService.logout());
+  }
+
+  async editTask(task: any) {
+    this.actualTask = task;
+    this.name = task.Name;
+    this.description = task.Description;
+    let catName;
+    await this.categoryService.getOne(task.CategoryId).subscribe(data => {
+        catName = data.Name;
+    });
+    this.selectedCat = catName;
+    this.startDate = task.Agenda.startDate;
+    this.endDate = task.Agenda.endDate;
+
+    this.isEditing = true;
+  }
+
+  addUserToTask(task: any) {
+    this.reloadUsers();
+
+    this.isAddingSomeone = true;
+  }
+
+  updateTask(task: any) {
+
+  }
+
+  addUnderTask(task: any) {
+
+  }
+
+  isUserConcerned(user: any) : boolean {
+    let status = false;
+    this.actualTask.Concerning.forEach(element =>
+      {
+        if (user._id.trim() === element.trim()) {
+          status = true;
+        }
+        return status;
+    });
+    return status;
+  }
+
+  async removeUserFromTask(user: any) {
+    const toast = await this.toastController.create({
+      message: 'Mise a jour de la tâche réussie.',
+      duration: 2000,
+      color: 'success'
+    });
+
+    const index: number = this.actualTask.Concerning.indexOf(user._id);
+    if (index !== -1) {
+      this.actualTask.Concerning.splice(index, 1);
+    }
+
+    this.actualTask.Concerning.slice(user._id)
+    this.taskService.update({Concerning: this.actualTask.Concerning}, this.actualTask._id).subscribe(data => {
+      if(data) this.reloadUsers();
+      toast.present();
+    }, err => {
+      toast.message = "Mise a jour de la tâche échouée."
+      toast.color = "danger."
+      toast.present();
+    });
+  }
+
+  async addUserFromTask(user: any) {
+    const toast = await this.toastController.create({
+      message: 'Mise a jour de la tâche réussie.',
+      duration: 2000,
+      color: 'success'
+    });
+    let isInside = false;
+    this.actualTask.Concerning.forEach(element => {
+      if(element === user._id)
+        isInside = true;
+    });
+    if(isInside === false) {
+      this.actualTask.Concerning.push(user._id)
+    }
+    this.taskService.update({Concerning: this.actualTask.Concerning}, this.actualTask._id).subscribe(data => {
+      if(data) this.reloadUsers();
+      toast.present();
+    }, err => {
+      toast.message = "Mise a jour de la tâche échouée."
+      toast.color = "danger."
+      toast.present();
+    });
   }
 }

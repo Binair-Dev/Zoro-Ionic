@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuController } from '@ionic/angular';
+import { BehaviorSubject } from 'rxjs';
 import { AuthService } from './_services/auth.service';
 import { LocalStorageService } from './_services/local-storage.service';
-import { UserService } from './_services/user.service';
+import decode from 'jwt-decode';
+import { User } from './_models/user';
 
 @Component({
   selector: 'app-root',
@@ -20,16 +22,24 @@ export class AppComponent {
     private localStorageService: LocalStorageService,
     private authService: AuthService,
     private router: Router)
-     {
-    if(this.localStorageService.get("token") !== null) {
-      this.authService.isLogged$.next(true);
-    }
-    this.authService.isLogged$.subscribe(isLogged => {
+  {
+      let token = this.localStorageService.get("token");
+
+      if(token !== null) {
+        if(this.authService.isLogged$ === undefined ||this.authService.isLogged$ === null)
+          this.authService.isLogged$ = new BehaviorSubject(false);
+        else {
+          this.authService.isLogged$ = new BehaviorSubject(true);
+          this.authService.user = decode(token.accessToken) as User;
+        }
+      }
+
+      this.authService.isLogged$.subscribe(isLogged => {
       if(!isLogged) {
         this.router.navigate(["/login"]);
       }
-      if(isLogged && this.localStorageService.get("token") == null) this.authService.isLogged$.next(false);
-      if(isLogged && this.authService.getUser() !== null) {
+
+      if(isLogged && token.accessToken !== null) {
         this.menu = [
           { text: 'Accueil', url: '/home', icon: 'home' },
           { text: 'Déconnexion', url: '/logout', icon: 'log-out' },
@@ -37,8 +47,10 @@ export class AppComponent {
         this.menu = [...this.menu, {text: 'Profile', url: '/profile', icon: 'people'}]
         this.menu = [...this.menu, {text: 'Tâches', url: '/task', icon: 'document-attach'}]
 
-        if(this.authService.getUser().Rank !== null && this.authService.getUser().Rank === "Administrateur") {
-          this.menu = [...this.menu, {text: 'Administration', url: '/admin', icon: 'document'}]
+        if(this.authService.getUser() !== undefined && this.authService.getUser() !== null) {
+          if(this.authService.getUser() !== null && this.authService.getUser().Rank !== null && this.authService.getUser().Rank === "Administrateur") {
+            this.menu = [...this.menu, {text: 'Administration', url: '/admin', icon: 'document'}]
+          }
         }
       }else {
         this.menu = [
@@ -47,7 +59,6 @@ export class AppComponent {
         ]
       }
     })
-
   }
 
   closeMenu() {

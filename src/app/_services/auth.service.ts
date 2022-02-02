@@ -14,8 +14,7 @@ export class AuthService {
   AUTH_SERVER = "http://127.0.0.1:5400";
 
   constructor(private httpClient: HttpClient, private localStorage: LocalStorageService) {
-    if(localStorage.get("token") !== null) this.isLogged$ = new BehaviorSubject(true);
-    else this.isLogged$ = new BehaviorSubject(true);
+    if(this.isLogged$ === undefined) this.isLogged$ = new BehaviorSubject(false);
   }
 
   login(user: any): Observable<any> {

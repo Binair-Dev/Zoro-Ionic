@@ -25,6 +25,10 @@ export class CategoryService {
     return this.httpClient.get(this.AUTH_SERVER + "/api/category/", {headers: {'Authorization':'Bearer ' + this.localStorageService.get("token").accessToken}});
   }
 
+  getOne(id: string): Observable<any> {
+    return this.httpClient.get(this.AUTH_SERVER + "/api/category/" + id, {headers: {'Authorization':'Bearer ' + this.localStorageService.get("token").accessToken}});
+  }
+
   delete(id: string): Observable<any> {
     return this.httpClient.delete(this.AUTH_SERVER + "/api/category/" + id, {headers: {'Authorization':'Bearer ' + this.localStorageService.get("token").accessToken}});
   }

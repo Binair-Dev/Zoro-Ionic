@@ -2,16 +2,17 @@
   <ion-toolbar>
     <ion-item>
       <ion-title>Tâches</ion-title>
-      <ion-button *ngIf="isCreating" class="btn-normal" (click)="reset()">Retour</ion-button>
+      <ion-button *ngIf="!isCreating && !isEditing" (click)="reloadTasks()"><ion-icon name="refresh"></ion-icon></ion-button>
+      <ion-button *ngIf="isCreating || isEditing" class="btn-normal" (click)="reset()">Retour</ion-button>
     </ion-item>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-button *ngIf="isAdmin && !isCreating" (click)="isCreating = true" class="center-button">
+  <ion-button *ngIf="isAdmin && !isCreating && !isEditing" (click)="isCreating = true" class="center-button">
     Créer une tâche
   </ion-button>
-  <ion-content *ngIf="isCreating">
+  <ion-content *ngIf="isCreating && !isEditing">
     <div>
       <ion-item>
         <ion-input  [(ngModel)]="name" type="text" placeholder="Nom" ngModel required></ion-input>
@@ -43,7 +44,52 @@
       </ion-item>
     </div>
   </ion-content>
-  <ion-content *ngIf="!isCreating">
-
+  <ion-content *ngIf="!isCreating && !isEditing">
+    <ion-list *ngFor="let task of this.TaskList">
+      <ion-item>
+        <ion-label>
+          <h2>{{task.Name}}</h2>
+          <p>{{task.Description}}</p>
+        </ion-label>
+        <ion-button (click)="editTask(task)"><ion-icon name="create"></ion-icon></ion-button>
+        <ion-button class="btn-danger" *ngIf="isAdmin" (click)="deleteTask(task._id)">X</ion-button>
+      </ion-item>
+    </ion-list>
   </ion-content>
+<ion-content *ngIf="isEditing && !isAddingSomeone">
+  <div>
+    <ion-item>
+      <ion-input  [(ngModel)]="name" type="text" placeholder="Nom" ngModel required></ion-input>
+    </ion-item>
+    <ion-item>
+        <ion-input [(ngModel)]="description" type="text" placeholder="Description" ngModel required></ion-input>
+    </ion-item>
+    <ion-item>
+      <div class='center-button'>
+        <ion-button (click)="selectDates()">Redéfinir les dates</ion-button>
+      </div>
+    </ion-item>
+    <ion-item>
+      <div class='center-button'>
+        <ion-button (click)="addUserToTask(actualTask)">Ajouter un utilisateur</ion-button>
+     </div>
+    </ion-item>
+    <ion-item>
+      <div class='center-button'>
+        <ion-button (click)="addUnderTask(actualTask)">Ajouter une sous tâche</ion-button>
+     </div>
+    </ion-item>
+  </div>
+</ion-content>
+<ion-content *ngIf="isAddingSomeone === true">
+  <ion-list *ngFor="let user of this.Concerning">
+    <ion-item>
+      <ion-label>
+        <h2>{{user.Email}}</h2>
+      </ion-label>
+      <ion-button *ngIf="isUserConcerned(user)" (click)="removeUserFromTask(user)" class="btn-danger">Retirer</ion-button>
+      <ion-button *ngIf="!isUserConcerned(user)" (click)="addUserFromTask(user)" class="btn-success">Ajouter</ion-button>
+    </ion-item>
+  </ion-list>
+</ion-content>
 </ion-content>
